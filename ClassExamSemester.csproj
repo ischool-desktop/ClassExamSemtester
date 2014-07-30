@@ -102,6 +102,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Final.xls" />
     <None Include="Resources\Report.png" />
     <None Include="Resources\Template.xls" />
   </ItemGroup>
