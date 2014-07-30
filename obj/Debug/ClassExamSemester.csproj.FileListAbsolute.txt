@@ -1,0 +1,9 @@
+D:\Github\Workspace\實中雙語學期成績\obj\Debug\ClassExamSemester.frm_printsetup.resources
+D:\Github\Workspace\實中雙語學期成績\obj\Debug\ClassExamSemester.Properties.Resources.resources
+D:\Github\Workspace\實中雙語學期成績\obj\Debug\ClassExamSemester.csproj.GenerateResource.Cache
+D:\Github\Workspace\實中雙語學期成績\bin\Debug\ClassExamSemester.dll
+D:\Github\Workspace\實中雙語學期成績\bin\Debug\ClassExamSemester.pdb
+D:\Github\Workspace\實中雙語學期成績\bin\Debug\FISCA.Data.dll
+D:\Github\Workspace\實中雙語學期成績\obj\Debug\ClassExamSemester.dll
+D:\Github\Workspace\實中雙語學期成績\obj\Debug\ClassExamSemester.pdb
+D:\Github\Workspace\實中雙語學期成績\obj\Debug\ClassExamSemester.csprojResolveAssemblyReference.cache
