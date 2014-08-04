@@ -235,6 +235,24 @@ namespace ClassExamSemester
                 s2.VerticalAlignment = TextAlignmentType.Center;
                 s2.IsTextWrapped = true;
 
+                //設定Style3樣板：三邊細線 右線粗線 水平字左 垂直字中 自動換行
+                Style s3 = wb.Styles[wb.Styles.Add()];
+                s3.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                s3.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                s3.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                s3.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thick;
+                s3.HorizontalAlignment = TextAlignmentType.Left;
+                s3.VerticalAlignment = TextAlignmentType.Center;
+
+                //設定Style4樣板：兩邊細線 右邊底線粗線 水平字左 垂直字中
+                Style s4 = wb.Styles[wb.Styles.Add()];
+                s4.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                s4.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thick;
+                s4.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                s4.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thick;
+                s4.HorizontalAlignment = TextAlignmentType.Left;
+                s4.VerticalAlignment = TextAlignmentType.Center;
+
                 //列印科目名稱
                 int indexSub = 2; //前面有NO & Name，所以從indexSub = 2
                 foreach (String sub in class_subject_list[cls.ID])
@@ -259,7 +277,7 @@ namespace ClassExamSemester
                     wb.Worksheets[sheet_index].Cells[indexrow, 0].Style = s;
                     wb.Worksheets[sheet_index].Cells[indexrow, 0].PutValue(student.SeatNo);
                     wb.Worksheets[sheet_index].Cells[indexrow, 1].Style = s;
-                    wb.Worksheets[sheet_index].Cells[indexrow, 1].PutValue(student.Name);
+                    wb.Worksheets[sheet_index].Cells[indexrow, 1].PutValue(student.Name + "  " + student.EnglishName);
                     //列印學生各科成績
                     foreach (string subj in class_subject_list[cls.ID])
                     {
@@ -290,12 +308,17 @@ namespace ClassExamSemester
                     }
                     indexrow++;
                 }
-                //每5格劃分隔線
-                for (int i = 2; i <= indexrow; i += 5)
-                {
-                    Range target = wb.Worksheets[sheet_index].Cells.CreateRange(i, 0, 1, indexSub + 3);
-                    target.Style = s2;
-                }         
+                Range test = wb.Worksheets[sheet_index].Cells.CreateRange(3, 1, indexrow - 3, 1);
+               test.Style = s3;
+
+               //每5格劃分隔線
+               for (int i = 2; i <= indexrow; i += 5)
+               {
+                   Range target = wb.Worksheets[sheet_index].Cells.CreateRange(i, 0, 1, indexSub + 3);
+                   target.Style = s2;
+               }
+                for (int j = 2; j <= indexrow; j += 5)
+                    wb.Worksheets[sheet_index].Cells[j, 1].Style = s4;
             }
 
             wb.Worksheets.RemoveAt(0);
