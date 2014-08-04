@@ -106,6 +106,12 @@ namespace ClassExamSemester
             }
 
             string student_ID = string.Join(",", sID);
+
+           if (student_ID == "")
+            {
+                MsgBox.Show("此班級無學生，請確認班級學生");
+                return;
+            }
             //組SQL語法抓取學生ID、科目、成績
             string sql = "select student.name,$ischool.course.extend.grade_year as level,class.id as class_id,course.credit,sc_attend.ref_student_id,course.subject,$ischool.subject.list.group,xpath_string(sce_take.extension,'//Extension/Score') as score from sc_attend";
             sql += " join course on sc_attend.ref_course_id=course.id";
@@ -116,7 +122,7 @@ namespace ClassExamSemester
             sql += " left join $ischool.subject.list on $ischool.subject.list.name=course.subject";
             sql += " where sc_attend.ref_student_id in (" + student_ID + ") and sce_take.ref_exam_id=" + period + " and course.school_year=" + _schoolYear + " and course.semester=" + _semester + "and student.status=1";
             DataTable dt = _Q.Select(sql);
-
+            
             Dictionary<string, StudentObj> stuObjDic = new Dictionary<string, StudentObj>();
             foreach (DataRow row in dt.Rows)
             {
@@ -128,7 +134,7 @@ namespace ClassExamSemester
 
                 stuObjDic[student_id].LoadData(row);
             }
-
+            
             //Rank
             foreach (ClassRecord c in class_list)
             {
@@ -218,33 +224,30 @@ namespace ClassExamSemester
                 s.HorizontalAlignment = TextAlignmentType.Center;
                 s.VerticalAlignment = TextAlignmentType.Center;
                 s.IsTextWrapped = true;
-                //設定Style2樣板：四邊框線
+
+                //設定Style2樣板：三邊細線 底線粗線 水平垂直字中 自動換行
                 Style s2 = wb.Styles[wb.Styles.Add()];
                 s2.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
-                s2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                s2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thick;
                 s2.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
                 s2.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
-
-                wb.Worksheets[sheet_index].Cells[2, 0].Style = s;
-                wb.Worksheets[sheet_index].Cells[2, 1].Style = s;
+                s2.HorizontalAlignment = TextAlignmentType.Center;
+                s2.VerticalAlignment = TextAlignmentType.Center;
+                s2.IsTextWrapped = true;
 
                 //列印科目名稱
-                int indexSub = 2;
+                int indexSub = 2; //前面有NO & Name，所以從indexSub = 2
                 foreach (String sub in class_subject_list[cls.ID])
                 {
-                    wb.Worksheets[sheet_index].Cells[2, indexSub].Style = s;
                     wb.Worksheets[sheet_index].Cells[2, indexSub].PutValue(sub);
                     indexSub++;
                 }
-                wb.Worksheets[sheet_index].Cells[2, indexSub].Style = s;
                 wb.Worksheets[sheet_index].Cells[2, indexSub].PutValue("Avg");
-                wb.Worksheets[sheet_index].Cells[2, indexSub + 1].Style = s;
                 wb.Worksheets[sheet_index].Cells[2, indexSub + 1].PutValue("Rank");
-                wb.Worksheets[sheet_index].Cells[2, indexSub + 2].Style = s;
                 wb.Worksheets[sheet_index].Cells[2, indexSub + 2].PutValue("Level");
                 //合併儲存格：First Row合併 ；Second Row Column 前三後三合併
-                wb.Worksheets[sheet_index].Cells.Merge(0, 0, 1, indexSub + 3); 
-                wb.Worksheets[sheet_index].Cells.Merge(1, 0, 1, 3); 
+                wb.Worksheets[sheet_index].Cells.Merge(0, 0, 1, indexSub + 3);
+                wb.Worksheets[sheet_index].Cells.Merge(1, 0, 1, 3);
                 wb.Worksheets[sheet_index].Cells.Merge(1, indexSub, 1, 3);
 
                 wb.Worksheets[sheet_index].Cells[1, indexSub].PutValue("列印日期：" + SelectTime());
@@ -255,7 +258,7 @@ namespace ClassExamSemester
                 {
                     wb.Worksheets[sheet_index].Cells[indexrow, 0].Style = s;
                     wb.Worksheets[sheet_index].Cells[indexrow, 0].PutValue(student.SeatNo);
-                    wb.Worksheets[sheet_index].Cells[indexrow, 1].Style = s2;
+                    wb.Worksheets[sheet_index].Cells[indexrow, 1].Style = s;
                     wb.Worksheets[sheet_index].Cells[indexrow, 1].PutValue(student.Name);
                     //列印學生各科成績
                     foreach (string subj in class_subject_list[cls.ID])
@@ -287,7 +290,12 @@ namespace ClassExamSemester
                     }
                     indexrow++;
                 }
-                //sheet_index++;
+                //每5格劃分隔線
+                for (int i = 2; i <= indexrow; i += 5)
+                {
+                    Range target = wb.Worksheets[sheet_index].Cells.CreateRange(i, 0, 1, indexSub + 3);
+                    target.Style = s2;
+                }         
             }
 
             wb.Worksheets.RemoveAt(0);
