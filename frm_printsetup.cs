@@ -308,9 +308,12 @@ namespace ClassExamSemester
                     }
                     indexrow++;
                 }
-                Range test = wb.Worksheets[sheet_index].Cells.CreateRange(3, 1, indexrow - 3, 1);
-               test.Style = s3;
-
+                if (indexrow > 3)
+                {
+                    Range test = wb.Worksheets[sheet_index].Cells.CreateRange(3, 1, indexrow - 3, 1);
+                    test.Style = s3;
+                }
+         
                //每5格劃分隔線
                for (int i = 2; i <= indexrow; i += 5)
                {
