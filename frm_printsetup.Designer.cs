@@ -56,10 +56,10 @@
             this.comBoxSchoolYear.DisplayMember = "Text";
             this.comBoxSchoolYear.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.comBoxSchoolYear.FormattingEnabled = true;
-            this.comBoxSchoolYear.ItemHeight = 23;
+            this.comBoxSchoolYear.ItemHeight = 19;
             this.comBoxSchoolYear.Location = new System.Drawing.Point(89, 38);
             this.comBoxSchoolYear.Name = "comBoxSchoolYear";
-            this.comBoxSchoolYear.Size = new System.Drawing.Size(121, 29);
+            this.comBoxSchoolYear.Size = new System.Drawing.Size(121, 25);
             this.comBoxSchoolYear.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.comBoxSchoolYear.TabIndex = 1;
             // 
@@ -68,10 +68,10 @@
             this.comBoxSemester.DisplayMember = "Text";
             this.comBoxSemester.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.comBoxSemester.FormattingEnabled = true;
-            this.comBoxSemester.ItemHeight = 23;
+            this.comBoxSemester.ItemHeight = 19;
             this.comBoxSemester.Location = new System.Drawing.Point(294, 38);
             this.comBoxSemester.Name = "comBoxSemester";
-            this.comBoxSemester.Size = new System.Drawing.Size(80, 29);
+            this.comBoxSemester.Size = new System.Drawing.Size(80, 25);
             this.comBoxSemester.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.comBoxSemester.TabIndex = 2;
             // 
@@ -135,17 +135,17 @@
             this.comBoxPeriod.DisplayMember = "Text";
             this.comBoxPeriod.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.comBoxPeriod.FormattingEnabled = true;
-            this.comBoxPeriod.ItemHeight = 23;
+            this.comBoxPeriod.ItemHeight = 19;
             this.comBoxPeriod.Location = new System.Drawing.Point(89, 96);
             this.comBoxPeriod.Name = "comBoxPeriod";
-            this.comBoxPeriod.Size = new System.Drawing.Size(285, 29);
+            this.comBoxPeriod.Size = new System.Drawing.Size(285, 25);
             this.comBoxPeriod.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.comBoxPeriod.TabIndex = 7;
             this.comBoxPeriod.Text = "Midterm";
             // 
             // frm_printsetup
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(404, 186);
             this.Controls.Add(this.comBoxPeriod);

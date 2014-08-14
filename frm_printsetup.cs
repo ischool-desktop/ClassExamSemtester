@@ -18,29 +18,28 @@ namespace ClassExamSemester
 {
     public partial class frm_printsetup : BaseForm
     {
-        private List<string> _class_ids;
-        private QueryHelper _Q;
-        private int _schoolYear, _semester;
+        private List<string> classIds;
+        private QueryHelper queryHelper;
+        private int schoolYear, semester;
 
-        public frm_printsetup(List<string> select_class_ids)
+        public frm_printsetup(List<string> selectClassIds)
         {
             InitializeComponent();
-            _class_ids = select_class_ids;
-            _Q = new QueryHelper();
+			classIds = selectClassIds;
+            this.queryHelper = new QueryHelper();
             //設定ComboBox清單數字
-            _schoolYear = int.Parse(K12.Data.School.DefaultSchoolYear);
-            _semester = int.Parse(K12.Data.School.DefaultSemester);
+            schoolYear = int.Parse(K12.Data.School.DefaultSchoolYear);
+            semester = int.Parse(K12.Data.School.DefaultSemester);
 
             //設定comBoxSchoolYear前二後二學年度
-            for (int i = -2; i <= 2; i++)
-            {
-                comBoxSchoolYear.Items.Add(_schoolYear + i);
+            for (int i = -2; i <= 2; i++){
+                comBoxSchoolYear.Items.Add(schoolYear + i);
             }
             //設定comBoxSemester值
             comBoxSemester.Items.Add(1);
             comBoxSemester.Items.Add(2);
-            comBoxSchoolYear.Text = _schoolYear + "";
-            comBoxSemester.Text = _semester + "";
+            comBoxSchoolYear.Text = schoolYear + "";
+            comBoxSemester.Text = semester + "";
             //設定comBoxPeriod值
             comBoxPeriod.Items.Add("Midterm");
             comBoxPeriod.Items.Add("Final");
@@ -60,55 +59,51 @@ namespace ClassExamSemester
         private void btn_yes_Click(object sender, EventArgs e)
         {
             //處理comboBox的例外狀況
-            int SchoolYear;
-            int Semester;
-            if (!int.TryParse(comBoxSchoolYear.Text, out SchoolYear))
-            {
+            int schoolYear;
+            int semester;
+            if (!int.TryParse(comBoxSchoolYear.Text, out schoolYear)){
                 MsgBox.Show("學年度必須選擇為數字");
                 return;
             }
-            if (!int.TryParse(comBoxSemester.Text, out Semester))
-            {
+            if (!int.TryParse(comBoxSemester.Text, out semester)){
                 MsgBox.Show("學期必須選擇為數字");
                 return;
             }
 
             //取得班級物件
-            List<ClassRecord> class_list = K12.Data.Class.SelectByIDs(_class_ids);
-            Dictionary<string, List<string>> class_subject_list = new Dictionary<string, List<string>>();
+			List<ClassRecord> classList = K12.Data.Class.SelectByIDs(classIds);
+            Dictionary<string, List<string>> classSubjectList = new Dictionary<string, List<string>>();
 
-            List<String> sID = new List<string>();
+            List<String> studentIds = new List<string>();
             //取得各班學生
-            foreach (ClassRecord record in class_list)
-            {
+            foreach (ClassRecord record in classList){
                 //班級科目清單
-                if (!class_subject_list.ContainsKey(record.ID))
-                    class_subject_list.Add(record.ID, new List<string>());
+				if (!classSubjectList.ContainsKey(record.ID)) {
+					classSubjectList.Add(record.ID, new List<string>());
+				}
+                   
 
                 //該班級的所有學生存入students
-                List<StudentRecord> students = record.Students;
+                List<StudentRecord> studentList = record.Students;
                 //整理各班學生資料型態變為List<String>
-                foreach (StudentRecord sr in students)
-                {
-                    if (!sID.Contains(sr.ID))
-                        sID.Add(sr.ID);
+                foreach (StudentRecord sr in studentList){
+					if (!studentIds.Contains(sr.ID)) {
+						studentIds.Add(sr.ID);
+					}   
                 }
             }
             //判斷選取的試別
             int period = 0;
-            if (comBoxPeriod.Text == "Midterm")
-            {
+            if (comBoxPeriod.Text == "Midterm"){
                 period = 1;
             }
-            else
-            {
+            else{
                 period = 2;
             }
 
-            string student_ID = string.Join(",", sID);
+            string strStudentId = string.Join(",", studentIds);
 
-           if (student_ID == "")
-            {
+           if (strStudentId == ""){
                 MsgBox.Show("此班級無學生，請確認班級學生");
                 return;
             }
@@ -120,47 +115,42 @@ namespace ClassExamSemester
             sql += " join class on class.id=student.ref_class_id";
             sql += " left join $ischool.course.extend on $ischool.course.extend.ref_course_id=course.id";
             sql += " left join $ischool.subject.list on $ischool.subject.list.name=course.subject";
-            sql += " where sc_attend.ref_student_id in (" + student_ID + ") and sce_take.ref_exam_id=" + period + " and course.school_year=" + _schoolYear + " and course.semester=" + _semester + "and student.status=1";
-            DataTable dt = _Q.Select(sql);
+            sql += " where sc_attend.ref_student_id in (" + strStudentId + ") and sce_take.ref_exam_id=" + period + " and course.school_year=" + schoolYear + " and course.semester=" + semester + "and student.status=1";
+            DataTable dt = queryHelper.Select(sql);
             
             Dictionary<string, StudentObj> stuObjDic = new Dictionary<string, StudentObj>();
-            foreach (DataRow row in dt.Rows)
-            {
-                string student_id = row["ref_student_id"] + "";
-                string class_id = row["class_id"] + "";
+            foreach (DataRow row in dt.Rows){
+                string studentId = row["ref_student_id"] + "";
+                string classId = row["class_id"] + "";
 
-                if (!stuObjDic.ContainsKey(student_id))
-                    stuObjDic.Add(student_id, new StudentObj(row));
-
-                stuObjDic[student_id].LoadData(row);
+				if (!stuObjDic.ContainsKey(studentId)) {
+					stuObjDic.Add(studentId, new StudentObj(row));
+				}
+                stuObjDic[studentId].LoadData(row);
             }
             
             //Rank
-            foreach (ClassRecord c in class_list)
-            {
-                List<StudentObj> score_list = new List<StudentObj>();
-                foreach (StudentRecord s in c.Students)
-                {
-                    if (stuObjDic.ContainsKey(s.ID))
-                        score_list.Add(stuObjDic[s.ID]);
+            foreach (ClassRecord cr in classList){
+                List<StudentObj> scoreList = new List<StudentObj>();
+                foreach (StudentRecord sr in cr.Students) {
+					if (stuObjDic.ContainsKey(sr.ID)) {
+						scoreList.Add(stuObjDic[sr.ID]);
+					}  
                 }
 
-                score_list.Sort(delegate(StudentObj x, StudentObj y)
-                {
+                scoreList.Sort(delegate(StudentObj x, StudentObj y){
                     return x.Avg.CompareTo(y.Avg);
                 });
 
-                score_list.Reverse();
+                scoreList.Reverse();
 
                 int rank = 0;
                 int count = 0;
                 decimal temp_score = decimal.MinValue;
-                foreach (StudentObj obj in score_list)
-                {
+                foreach (StudentObj obj in scoreList){
                     count++;
 
-                    if (temp_score != obj.Avg)
-                    {
+                    if (temp_score != obj.Avg){
                         rank = count;
                     }
                     obj.Rank = rank;
@@ -169,31 +159,28 @@ namespace ClassExamSemester
             }
 
             //各班科目清單
-            foreach (string key in stuObjDic.Keys)
-            {
+            foreach (string key in stuObjDic.Keys){
                 StudentObj obj = stuObjDic[key];
-                foreach (string subj in obj.Subject_Score.Keys)
-                {
-                    if (class_subject_list.ContainsKey(obj.ClassID))
-                        if (!class_subject_list[obj.ClassID].Contains(subj))
-                            class_subject_list[obj.ClassID].Add(subj);
+                foreach (string subj in obj.Subject_Score.Keys){
+					if (classSubjectList.ContainsKey(obj.ClassID)) {
+						if (!classSubjectList[obj.ClassID].Contains(subj)) {
+							classSubjectList[obj.ClassID].Add(subj);
+						}
+					}
                 }
             }
 
             //各班科目清單排序
-            foreach (string key in class_subject_list.Keys)
-                class_subject_list[key].Sort(Tool.GetSubjectCompare());
-
+			foreach (string key in classSubjectList.Keys) {
+				classSubjectList[key].Sort(Tool.GetSubjectCompare());
+			}
             //各班科目Columns Index
-            Dictionary<string, int> class_columns_index = new Dictionary<string, int>();
-            foreach (string key in class_subject_list.Keys)
-            {
+            Dictionary<string, int> classColumnsIndex = new Dictionary<string, int>();
+            foreach (string key in classSubjectList.Keys){
                 int index = 2;
-                foreach (string subj in class_subject_list[key])
-                {
-                    if (!class_columns_index.ContainsKey(key + "_" + subj))
-                    {
-                        class_columns_index.Add(key + "_" + subj, index);
+                foreach (string subj in classSubjectList[key]){
+                    if (!classColumnsIndex.ContainsKey(key + "_" + subj)){
+                        classColumnsIndex.Add(key + "_" + subj, index);
                         index++;
                     }
                 }
@@ -201,19 +188,18 @@ namespace ClassExamSemester
 
             Workbook wb = new Workbook();
             wb.Open(new MemoryStream(Properties.Resources.Template));
-            Worksheet template_sheet = wb.Worksheets["Template"];
+            Worksheet templateSheet = wb.Worksheets["Template"];
 
-            int sheet_index = 1;
+            int sheetIndex = 1;
             //每個班級列印一個Worksheet
-            foreach (ClassRecord cls in class_list)
-            {
-                sheet_index = wb.Worksheets.AddCopy("Template");
-                wb.Worksheets[sheet_index].Name = cls.Name;
+            foreach (ClassRecord cls in classList){
+                sheetIndex = wb.Worksheets.AddCopy("Template");
+                wb.Worksheets[sheetIndex].Name = cls.Name;
 
-                wb.Worksheets[sheet_index].Cells[0, 0].PutValue("雙語部  " + _schoolYear + "年度第" + _semester + "學期  評量成績");
-                wb.Worksheets[sheet_index].Cells[1, 0].PutValue(" Class：" + cls.Name + "       Period：" + comBoxPeriod.Text);
-                wb.Worksheets[sheet_index].Cells[2, 0].PutValue("SeatNo");
-                wb.Worksheets[sheet_index].Cells[2, 1].PutValue("Name");
+                wb.Worksheets[sheetIndex].Cells[0, 0].PutValue("雙語部  " + schoolYear + "年度第" + semester + "學期  評量成績");
+                wb.Worksheets[sheetIndex].Cells[1, 0].PutValue(" Class：" + cls.Name + "       Period：" + comBoxPeriod.Text);
+                wb.Worksheets[sheetIndex].Cells[2, 0].PutValue("SeatNo");
+                wb.Worksheets[sheetIndex].Cells[2, 1].PutValue("Name");
 
                 //設定Style樣板：四邊框線 水平垂直字中 自動換行
                 Style s = wb.Styles[wb.Styles.Add()];
@@ -255,73 +241,70 @@ namespace ClassExamSemester
 
                 //列印科目名稱
                 int indexSub = 2; //前面有NO & Name，所以從indexSub = 2
-                foreach (String sub in class_subject_list[cls.ID])
-                {
-                    wb.Worksheets[sheet_index].Cells[2, indexSub].PutValue(sub);
+                foreach (String sub in classSubjectList[cls.ID]){
+                    wb.Worksheets[sheetIndex].Cells[2, indexSub].PutValue(sub);
                     indexSub++;
                 }
-                wb.Worksheets[sheet_index].Cells[2, indexSub].PutValue("Avg");
-                wb.Worksheets[sheet_index].Cells[2, indexSub + 1].PutValue("Rank");
-                wb.Worksheets[sheet_index].Cells[2, indexSub + 2].PutValue("Level");
+                wb.Worksheets[sheetIndex].Cells[2, indexSub].PutValue("Avg");
+                wb.Worksheets[sheetIndex].Cells[2, indexSub + 1].PutValue("Rank");
+                wb.Worksheets[sheetIndex].Cells[2, indexSub + 2].PutValue("Level");
                 //合併儲存格：First Row合併 ；Second Row Column 前三後三合併
-                wb.Worksheets[sheet_index].Cells.Merge(0, 0, 1, indexSub + 3);
-                wb.Worksheets[sheet_index].Cells.Merge(1, 0, 1, 3);
-                wb.Worksheets[sheet_index].Cells.Merge(1, indexSub, 1, 3);
+                wb.Worksheets[sheetIndex].Cells.Merge(0, 0, 1, indexSub + 3);
+                wb.Worksheets[sheetIndex].Cells.Merge(1, 0, 1, 3);
+                wb.Worksheets[sheetIndex].Cells.Merge(1, indexSub, 1, 3);
 
-                wb.Worksheets[sheet_index].Cells[1, indexSub].PutValue("列印日期：" + SelectTime());
+                wb.Worksheets[sheetIndex].Cells[1, indexSub].PutValue("列印日期：" + SelectTime());
 
                 //列印學生
-                int indexrow = 3;
-                foreach (StudentRecord student in cls.Students)
-                {
-                    wb.Worksheets[sheet_index].Cells[indexrow, 0].Style = s;
-                    wb.Worksheets[sheet_index].Cells[indexrow, 0].PutValue(student.SeatNo);
-                    wb.Worksheets[sheet_index].Cells[indexrow, 1].Style = s;
-                    wb.Worksheets[sheet_index].Cells[indexrow, 1].PutValue(student.Name + "  " + student.EnglishName);
+                int indexRow = 3;
+                foreach (StudentRecord student in cls.Students){
+                    wb.Worksheets[sheetIndex].Cells[indexRow, 0].Style = s;
+                    wb.Worksheets[sheetIndex].Cells[indexRow, 0].PutValue(student.SeatNo);
+                    wb.Worksheets[sheetIndex].Cells[indexRow, 1].Style = s;
+                    wb.Worksheets[sheetIndex].Cells[indexRow, 1].PutValue(student.Name + "  " + student.EnglishName);
                     //列印學生各科成績
-                    foreach (string subj in class_subject_list[cls.ID])
-                    {
-                        int column_index = class_columns_index[cls.ID + "_" + subj];
+                    foreach (string subj in classSubjectList[cls.ID]){
+                        int column_index = classColumnsIndex[cls.ID + "_" + subj];
                         string score = "";
 
-                        if (stuObjDic.ContainsKey(student.ID))
-                            if (stuObjDic[student.ID].Subject_Score.ContainsKey(subj))
-                                score = stuObjDic[student.ID].Subject_Score[subj] + "";
-                        wb.Worksheets[sheet_index].Cells[indexrow, column_index].Style = s;
-                        wb.Worksheets[sheet_index].Cells[indexrow, column_index].PutValue(score);
+						if (stuObjDic.ContainsKey(student.ID)){
+							if (stuObjDic[student.ID].Subject_Score.ContainsKey(subj)) {
+								score = stuObjDic[student.ID].Subject_Score[subj] + "";
+							}	
+						}
+                        wb.Worksheets[sheetIndex].Cells[indexRow, column_index].Style = s;
+                        wb.Worksheets[sheetIndex].Cells[indexRow, column_index].PutValue(score);
                     }
 
                     StudentObj obj = null;
-                    if (stuObjDic.ContainsKey(student.ID))
-                        obj = stuObjDic[student.ID];
+					if (stuObjDic.ContainsKey(student.ID)){
+						obj = stuObjDic[student.ID];
+					}
+                    wb.Worksheets[sheetIndex].Cells[indexRow, indexSub].Style = s;
+                    wb.Worksheets[sheetIndex].Cells[indexRow, indexSub + 1].Style = s;
+                    wb.Worksheets[sheetIndex].Cells[indexRow, indexSub + 2].Style = s;
 
-                    wb.Worksheets[sheet_index].Cells[indexrow, indexSub].Style = s;
-                    wb.Worksheets[sheet_index].Cells[indexrow, indexSub + 1].Style = s;
-                    wb.Worksheets[sheet_index].Cells[indexrow, indexSub + 2].Style = s;
 
-
-                    if (obj != null)
-                    {
-                        wb.Worksheets[sheet_index].Cells[indexrow, indexSub].PutValue(obj.Avg);
-                        wb.Worksheets[sheet_index].Cells[indexrow, indexSub + 1].PutValue(obj.Rank);
-                        wb.Worksheets[sheet_index].Cells[indexrow, indexSub + 2].PutValue(obj.Level);
+                    if (obj != null){
+                        wb.Worksheets[sheetIndex].Cells[indexRow, indexSub].PutValue(obj.Avg);
+                        wb.Worksheets[sheetIndex].Cells[indexRow, indexSub + 1].PutValue(obj.Rank);
+                        wb.Worksheets[sheetIndex].Cells[indexRow, indexSub + 2].PutValue(obj.Level);
                     }
-                    indexrow++;
+                    indexRow++;
                 }
-                if (indexrow > 3)
-                {
-                    Range test = wb.Worksheets[sheet_index].Cells.CreateRange(3, 1, indexrow - 3, 1);
+                if (indexRow > 3){
+                    Range test = wb.Worksheets[sheetIndex].Cells.CreateRange(3, 1, indexRow - 3, 1);
                     test.Style = s3;
                 }
          
                //每5格劃分隔線
-               for (int i = 2; i <= indexrow; i += 5)
-               {
-                   Range target = wb.Worksheets[sheet_index].Cells.CreateRange(i, 0, 1, indexSub + 3);
+               for (int i = 2; i <= indexRow; i += 5) {
+                   Range target = wb.Worksheets[sheetIndex].Cells.CreateRange(i, 0, 1, indexSub + 3);
                    target.Style = s2;
                }
-                for (int j = 2; j <= indexrow; j += 5)
-                    wb.Worksheets[sheet_index].Cells[j, 1].Style = s4;
+			   for (int j = 2; j <= indexRow; j += 5) {
+				   wb.Worksheets[sheetIndex].Cells[j, 1].Style = s4;
+			   }
             }
 
             wb.Worksheets.RemoveAt(0);
@@ -329,15 +312,12 @@ namespace ClassExamSemester
             save.Title = "另存新檔";
             save.FileName = "PeriodGrade_Semester.xls";
             save.Filter = "Excel檔案 (*.xls)|*.xls|所有檔案 (*.*)|*.*";
-            if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                try
-                {
+            if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                try {
                     wb.Save(save.FileName, Aspose.Cells.FileFormatType.Excel2003);
                     System.Diagnostics.Process.Start(save.FileName);
                 }
-                catch
-                {
+                catch {
                     MessageBox.Show("檔案儲存失敗");
                 }
             }
