@@ -196,7 +196,7 @@ namespace ClassExamSemester
                 sheetIndex = wb.Worksheets.AddCopy("Template");
                 wb.Worksheets[sheetIndex].Name = cls.Name;
 
-                wb.Worksheets[sheetIndex].Cells[0, 0].PutValue("雙語部  " + schoolYear + "年度第" + semester + "學期  評量成績");
+				wb.Worksheets[sheetIndex].Cells[0, 0].PutValue("雙語部  " + (schoolYear + 1911) + "~" + (schoolYear + 1912) + "年度第" + semester + "學期  評量成績");
                 wb.Worksheets[sheetIndex].Cells[1, 0].PutValue(" Class：" + cls.Name + "       Period：" + comBoxPeriod.Text);
                 wb.Worksheets[sheetIndex].Cells[2, 0].PutValue("SeatNo");
                 wb.Worksheets[sheetIndex].Cells[2, 1].PutValue("Name");
@@ -310,7 +310,7 @@ namespace ClassExamSemester
             wb.Worksheets.RemoveAt(0);
             SaveFileDialog save = new SaveFileDialog();
             save.Title = "另存新檔";
-            save.FileName = "PeriodGrade_Semester.xls";
+			save.FileName = comBoxSchoolYear.Text + "." + comBoxSemester.Text + "班級評量成績單.xls";
             save.Filter = "Excel檔案 (*.xls)|*.xls|所有檔案 (*.*)|*.*";
             if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                 try {
