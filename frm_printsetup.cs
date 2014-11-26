@@ -81,13 +81,12 @@ namespace ClassExamSemester
 				if (!classSubjectList.ContainsKey(record.ID)) {
 					classSubjectList.Add(record.ID, new List<string>());
 				}
-                   
-
                 //該班級的所有學生存入students
                 List<StudentRecord> studentList = record.Students;
                 //整理各班學生資料型態變為List<String>
                 foreach (StudentRecord sr in studentList){
-					if (!studentIds.Contains(sr.ID)) {
+					if (!studentIds.Contains(sr.ID))
+					{
 						studentIds.Add(sr.ID);
 					}   
                 }
@@ -258,6 +257,8 @@ namespace ClassExamSemester
                 //列印學生
                 int indexRow = 3;
                 foreach (StudentRecord student in cls.Students){
+					if (student.Status != StudentRecord.StudentStatus.一般)
+						continue;
                     wb.Worksheets[sheetIndex].Cells[indexRow, 0].Style = s;
                     wb.Worksheets[sheetIndex].Cells[indexRow, 0].PutValue(student.SeatNo);
                     wb.Worksheets[sheetIndex].Cells[indexRow, 1].Style = s;

@@ -158,7 +158,7 @@
 			this.Controls.Add(this.btn_yes);
 			this.DoubleBuffered = true;
 			this.Name = "frm_printsetup";
-			this.Text = "班級學期成績單";
+			this.Text = "班級評量成績單";
 			this.ResumeLayout(false);
 
         }

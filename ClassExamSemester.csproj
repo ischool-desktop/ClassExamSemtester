@@ -49,6 +49,7 @@
     </Reference>
     <Reference Include="FISCA.Data">
       <HintPath>library\FISCA.Data.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="FISCA.Permission">
       <HintPath>library\FISCA.Permission.dll</HintPath>
