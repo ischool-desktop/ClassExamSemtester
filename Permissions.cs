@@ -8,14 +8,14 @@ namespace ClassExamSemester
 {
     class Permissions
     {
-        public static bool 班級學期成績單權限
+        public static bool 班級評量成績單權限
         {
             get
             {
-                return FISCA.Permission.UserAcl.Current[班級學期成績單].Executable;
+                return FISCA.Permission.UserAcl.Current[班級評量成績單].Executable;
             }
         }
 
-        public static string 班級學期成績單 = "ClassExamSemester-{0183C5AB-BD58-4468-BBC6-D0AD48993859}";
+        public static string 班級評量成績單 = "ClassExamSemester-{0183C5AB-BD58-4468-BBC6-D0AD48993859}";
     }
 }
