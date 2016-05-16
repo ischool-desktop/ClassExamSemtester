@@ -35,9 +35,9 @@
       <HintPath>library\Aspose.Cells.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="CourseGradeB">
+    <Reference Include="CourseGradeB, Version=1.0.0.50, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>library\CourseGradeB.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="DevComponents.DotNetBar2, Version=9.5.0.1, Culture=neutral, PublicKeyToken=7eb7c3a35b91de04, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -108,6 +108,18 @@
     <None Include="Resources\Final.xls" />
     <None Include="Resources\Report.png" />
     <None Include="Resources\Template.xls" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="library\Aspose.Cells.dll" />
+    <Content Include="library\CourseGradeB.dll" />
+    <Content Include="library\CourseGradeB.pdb" />
+    <Content Include="library\DevComponents.DotNetBar2.dll" />
+    <Content Include="library\FISCA.Data.dll" />
+    <Content Include="library\FISCA.dll" />
+    <Content Include="library\FISCA.Permission.dll" />
+    <Content Include="library\FISCA.Presentation.dll" />
+    <Content Include="library\K12.Data.dll" />
+    <Content Include="library\K12.Presentation.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

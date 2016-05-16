@@ -73,6 +73,7 @@ namespace ClassExamSemester
             //取得班級物件
 			List<ClassRecord> classList = K12.Data.Class.SelectByIDs(classIds);
             Dictionary<string, List<string>> classSubjectList = new Dictionary<string, List<string>>();
+            Dictionary<string, SubjectCompare> classSubjectCompare = new Dictionary<string, SubjectCompare>();
 
             List<String> studentIds = new List<string>();
             //取得各班學生
@@ -80,6 +81,28 @@ namespace ClassExamSemester
                 //班級科目清單
 				if (!classSubjectList.ContainsKey(record.ID)) {
 					classSubjectList.Add(record.ID, new List<string>());
+                    switch (record.GradeYear.Value)
+                    {
+                        default:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                            classSubjectCompare.Add(record.ID, Tool.GetSubjectCompare(Tool.DomainDic[6]));
+                            break;
+                        case 7:
+                        case 8:
+                            classSubjectCompare.Add(record.ID, Tool.GetSubjectCompare(Tool.DomainDic[8]));
+                            break;
+                        case 9:
+                        case 10:
+                        case 11:
+                        case 12:
+                            classSubjectCompare.Add(record.ID, Tool.GetSubjectCompare(Tool.DomainDic[12]));
+                            break;
+                    }
 				}
                 //該班級的所有學生存入students
                 List<StudentRecord> studentList = record.Students;
@@ -170,9 +193,10 @@ namespace ClassExamSemester
             }
 
             //各班科目清單排序
-			foreach (string key in classSubjectList.Keys) {
-				classSubjectList[key].Sort(Tool.GetSubjectCompare());
-			}
+            foreach (string key in classSubjectList.Keys)
+            {
+                classSubjectList[key].Sort(classSubjectCompare[key]);
+            }
             //各班科目Columns Index
             Dictionary<string, int> classColumnsIndex = new Dictionary<string, int>();
             foreach (string key in classSubjectList.Keys){
